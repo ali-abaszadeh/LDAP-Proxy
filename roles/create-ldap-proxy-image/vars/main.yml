@@ -10,9 +10,9 @@ docker_image_name: openldap_proxy
 # Production environment
 #
 repo_server: 172.29.234.147
-pro_registery_address: repo.sadad.co.ir/repository/kolla-docker-registery/
+pro_registery_address: repo.example.co.ir/repository/kolla-docker-registery/
 pro_registery_username: cloud
-pro_registery_password: cloud@1234
+pro_registery_password: password
 pro_tag_number: v3
 pro_image: "{{ pro_registery_address }}{{ docker_image_name }}:{{ pro_tag_number }}"
 
@@ -21,8 +21,8 @@ pro_image: "{{ pro_registery_address }}{{ docker_image_name }}:{{ pro_tag_number
 # Test environment
 #
 osrepo_server: 172.29.234.6
-test_registery_address: repo.sadad.test/repository/docker-ldap/
+test_registery_address: repo.example.test/repository/docker-ldap/
 test_registery_username: admin2
-test_registery_password: adminpass
+test_registery_password: password
 test_tag_number: v3
 test_image: "{{ test_registery_address }}{{ docker_image_name }}:{{ test_tag_number }}"
