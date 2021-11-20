@@ -5,6 +5,7 @@ Logo
 LDAP-Proxy
 
 Install and configure LDAP Proxy
+
 About The Project
 
 This ansible script developed for install and configure LDAP Proxy. 
