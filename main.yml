@@ -1,0 +1,12 @@
+---
+
+- name: Install LDAP Proxy
+  hosts: ldap-proxy
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  roles:
+    - create-ldap-proxy-image
+    - install-ldap-proxy
+

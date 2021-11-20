@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+  openldap_proxy:
+    image: openldap_proxy:latest
+    container_name: openldap_proxy
+    ports:
+      - '389:389'
+      - "636:636"
+    network_mode: host
+    volumes:
+      - '/sys/fs/cgroup/:/sys/fs/cgroup:ro'
+      - '/etc/localtime:/etc/localtime:ro'
+      - ldap_proxy_data:/root/openldap_proxy/data
+      - ldap_proxy_slapd:/etc/openldap
+    command: bash -l -c "cd /root/openldap_proxy && /usr/sbin/slapd -h 'ldap:/// ldapi:/// ldaps:///' -g ldap -u ldap -d 2"
+
+    
+volumes:
+  ldap_proxy_data:
+    external: true
+  ldap_proxy_slapd:
+    external: true

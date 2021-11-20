@@ -1,0 +1,114 @@
+---
+# tasks file for create repo
+
+- name: System details
+  debug: msg= "{{ item }}"
+  with_items: 
+  - "{{ ansible_distribution }}"
+  - "{{ ansible_distribution_version }}"
+  - "{{ ansible_distribution_major_version }}"
+
+- name: Copy local repository file in LDAP nodes
+  template:
+    src: files/sources.list
+    dest: /etc/apt
+  when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] == "18") # Only Ubuntu 18.04
+
+- name: Add an Apt docker signing key, uses whichever key is at the URL
+  ansible.builtin.apt_key:
+    url: "http://{{ osrepo_server }}/docker/mirror/download.docker.com/linux/ubuntu/release.asc"
+    state: present
+  when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] == "18") # Only Ubuntu 18.04
+
+- name: Add an Apt ceph signing key, uses whichever key is at the URL
+  ansible.builtin.apt_key:
+    url: "http://{{ osrepo_server }}/ceph/mirror/download.ceph.com/debian-octopus/release.asc"
+    state: present
+  when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] == "18") # Only Ubuntu 18.0
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+
+
+- name: Install a list of packages(docker packages)
+  apt:
+    pkg:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+
+- name: Restart service docker, in all cases
+  ansible.builtin.service:
+    name: docker
+    state: restarted
+
+- name: create build directory
+  file:
+    path: /opt/demo-dockerfile
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: copy Dockerfile and other needed files
+  copy:
+    src: files/{{ item }}
+    dest: /opt/demo-dockerfile/{{ item }}
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+  - Dockerfile
+  - inetorgperson.ldif
+  - slapd.conf
+  - start.sh
+
+
+- name: build the image and tag for pro registery
+  shell: docker build -t "{{ pro_registery_address }}""{{ docker_image_name }}":"{{ pro_tag_number }}" .
+  args:
+    chdir: /opt/demo-dockerfile
+
+
+- name: build the image and tag for test registery
+  shell: docker build -t "{{ test_registery_address }}""{{ docker_image_name }}":"{{ test_tag_number }}" .
+  args:
+    chdir: /opt/demo-dockerfile
+
+
+- name: Copy CA server .crt file in LDAP nodes(In order to docker pull from Nexus server)
+  template:
+    src: files/testROOTCA.crt
+    dest: /usr/local/share/ca-certificates
+
+- name: Install certificate on LDAP servers
+  shell: update-ca-ceritificates
+  when: (ansible_facts['distribution'] == "Ubuntu")
+
+- name: Restart service docker, in all cases
+  ansible.builtin.service:
+    name: docker
+    state: restarted
+
+
+- name: Login to private registry(production registery) and force re-authorization
+  shell: docker login -u "{{ pro_registery_username }}" -p "{{ pro_registery_password }}" "{{ pro_registery_address }}"  
+
+
+- name: Tag and push to local registry(pro)
+  shell: docker push "{{ pro_registery_address }}""{{ docker_image_name }}":"{{ pro_tag_number }}"
+
+
+- name: Login to private registry(test nexus registery) and force re-authorization
+  shell: docker login -u "{{ test_registery_username }}" -p "{{ test_registery_password }}" "{{ test_registery_address }}"
+
+- name: Tag and push to local registry(nexus)
+  shell: docker push "{{ test_registery_address }}""{{ docker_image_name }}":"{{ test_tag_number }}"
+
+- name: Remove image from local
+  shell: docker rmi {{ item }}
+  with_items:
+  - "{{ pro_image }}"
+  - "{{ test_image }}"
+

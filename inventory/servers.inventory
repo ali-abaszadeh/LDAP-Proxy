@@ -1,0 +1,5 @@
+[ldap-proxy]
+ldap-proxy1 ansible_host=172.29.234.175 ansible_user=ubuntu ansible_ssh_port=22
+ldap-proxy2 ansible_host=172.29.234.153 ansible_user=ubuntu ansible_ssh_port=22
+
+

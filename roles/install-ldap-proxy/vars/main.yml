@@ -1,0 +1,7 @@
+---
+# vars file
+
+osrepo_server: 172.29.234.6
+docker_compose_version: v2.0.1
+#ldap_proxy_image: repo.sadad.co.ir/repository/kolla-docker-registery/openldap_proxy:latest
+ldap_proxy_image: repo.sadad.test/repository/docker-ldap/openldap_proxy:v1

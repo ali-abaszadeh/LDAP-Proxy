@@ -1,0 +1,95 @@
+---
+# tasks file for create repo
+
+- name: Copy local repository file in LDAP nodes
+  template:
+    src: files/sources.list
+    dest: /etc/apt
+
+- name: Add an Apt docker signing key, uses whichever key is at the URL
+  ansible.builtin.apt_key:
+    url: "http://{{ osrepo_server }}/docker/mirror/download.docker.com/linux/ubuntu/release.asc"
+    state: present
+
+- name: Add an Apt ceph signing key, uses whichever key is at the URL
+  ansible.builtin.apt_key:
+    url: "http://{{ osrepo_server }}/ceph/mirror/download.ceph.com/debian-octopus/release.asc"
+    state: present
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+
+
+- name: Install a list of packages(docker packages)
+  apt:
+    pkg:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+
+
+- name: Download docker-compose file
+  shell: curl -L "https://github.com/docker/compose/releases/download/{{ docker_compose_version}}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+- name: Set permission docker-compose file
+  shell: chmod +x /usr/local/bin/docker-compose
+
+
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: /usr/local/bin/docker-compose
+    dest: /usr/bin/docker-compose
+    owner: root
+    group: root
+    state: link
+
+- name: Test docker-compose command
+  shell: docker-compose --version
+
+- name: Start service docker, in all cases
+  ansible.builtin.service:
+    name: docker
+    state: restarted
+
+- name: Copy CA server .crt file in LDAP nodes(In order to docker pull from Nexus server)
+  template:
+    src: files/testROOTCA.crt
+    dest: /usr/local/share/ca-certificates
+
+- name: Install certificate on LDAP servers
+  shell: update-ca-certificates 
+
+- name: Restart service docker, in all cases
+  ansible.builtin.service:
+    name: docker
+    state: restarted
+
+
+- name: Pull ldap-proxy image
+  shell: docker pull "{{ ldap_proxy_image }}"
+
+
+- name: Create ldap-proxy directory
+  file:
+    path: /opt/openldap_proxy
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: 0775
+    recurse: yes
+
+
+- name: Copy docker-compose file in LDAP nodes
+  template:
+    src: files/{{ item }}
+    dest: /opt/openldap_proxy
+  loop:
+    - docker-compose.yml
+
+- name: Running container using docker-compose
+  shell: docker-compose up -d
+  args:
+    chdir: /opt/openldap_proxy
+
+
