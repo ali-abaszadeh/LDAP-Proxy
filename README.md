@@ -1,6 +1,7 @@
 # LDAP-Proxy
 Install and configure LDAP Proxy
-This ansible script developed for install and configure LDAP Proxy. You can use it for Cloud environment and also before Active directory servers in your environments.
+This ansible script developed for install and configure LDAP Proxy. 
+You can use it on the Cloud environment between Keystone and Active Directory and also before Active Directory servers in another situation in your environments.
 
 At first you have to clone code to your desktop and change variables based on your environment. 
 
