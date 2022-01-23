@@ -37,7 +37,6 @@ You can use it on the Cloud environment between Keystone and Active Directory an
 
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
 
 
 ## Contact
