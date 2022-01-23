@@ -1,49 +1,66 @@
-
-LDAP-Proxy
-
-Logo
-LDAP-Proxy
+# LDAP-Proxy
 
 Install and configure LDAP Proxy
 
-About The Project
+# About The Project
 
 This ansible script developed for install and configure LDAP Proxy. 
-You can use it on the Cloud environment between Keystone and Active Directory and also before Active Directory servers in another situation in your environments.
+You can use it on the Cloud environment between Keystone and Active Directory and also before Active Directory servers in your operation environments.
 
+## Installation
 
-Built With
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+
+```bash
+pip install foobar
+```
+
+## Built With
 
 docker
-Getting Started
+
+## Getting Started
+
+At first you should clone code to your desktop and change variables based on your environment.
+
+Clone the repo
+```bash
+Redhat based distributions
+yum repolist && yum install git -y 
+
+Debian based distributions
+apt update && apt install git
+git clone https://github.com/ali-abaszadeh/LDAP-Proxy.git
+
+ansible-playbook -i inventory/server.inventory main.yml
+```
 
 
-Prerequisites
 
-At first you have to clone code to your desktop and change variables based on your environment.
-
-    Clone the repo
-
-    git clone https://github.com/ali-abaszadeh/LDAP-Proxy.git
-
-    Run ansible-playbook -i inventory/server.inventory main.yml
-
-Usage
+## Usage
 
 You can use it on the Cloud environment between Keystone and Active Directory and also before Active Directory servers in another situation in your environments.
-Roadmap
 
-    Add Changelog
-   
+```python
+import foobar
 
-License
+# returns 'words'
+foobar.pluralize('word')
 
-Distributed under the Adjust License. See LICENSE.txt for more information.
+# returns 'geese'
+foobar.pluralize('goose')
 
-(back to top)
-Contact
+# returns 'phenomenon'
+foobar.singularize('phenomena')
+```
+
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
+
+
+## Contact
 
 a.abaszadeh1363@gmail.com
 
 Project Link: [https://github.com/ali-abaszadeh/LDAP-Proxy]
-Acknowledgments
